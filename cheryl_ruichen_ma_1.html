@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ruichen(Cheryl) Ma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #ffffff;
+    --ink: #000000;
+    --muted: #6b6b6b;
+    --hover: #888888;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .content::-webkit-scrollbar { width: 6px; }
+  .content::-webkit-scrollbar-track { background: transparent; }
+  .content::-webkit-scrollbar-thumb { background: #ddd; }
+  .content::-webkit-scrollbar-thumb:hover { background: #bbb; }
+
+  .topbar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 42px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 24px;
+    background: var(--bg);
+    z-index: 100;
+  }
+  .brand { display: flex; align-items: baseline; gap: 12px; }
+  .brand-name { font-weight: 700; font-size: 15px; letter-spacing: 0.02em; }
+
+  .mode-toggle { display: flex; align-items: baseline; gap: 0; }
+  .mode-btn {
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.04em; color: var(--ink);
+    opacity: 0.3; padding: 0; transition: opacity 0.2s;
+  }
+  .mode-btn.active { opacity: 1; }
+  .mode-btn:hover { opacity: 0.7; }
+  .mode-divider { font-size: 11px; color: var(--ink); opacity: 0.3; padding: 0 5px; pointer-events: none; }
+
+  .topbar-right { display: flex; gap: 18px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; }
+  .topbar-right a { color: var(--ink); text-decoration: none; transition: color 0.2s; }
+  .topbar-right a:hover { color: var(--hover); }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 30vw 1fr;
+    padding-top: 42px;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 42px; left: 0;
+    width: 30vw;
+    height: calc(100vh - 42px);
+    padding: 24px;
+    background: var(--bg);
+    z-index: 50;
+  }
+
+  .sidebar-designer { display: block; }
+  .sidebar-photographer { display: none; }
+
+  .nav-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .nav-list li { display: grid; grid-template-columns: 32px 1fr; gap: 6px; align-items: start; }
+  .nav-num { font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .nav-link {
+    font-weight: 700; font-size: 14px; letter-spacing: 0.02em;
+    color: var(--ink); text-decoration: none; text-transform: uppercase;
+    cursor: pointer; transition: color 0.2s, opacity 0.2s; line-height: 1.35;
+  }
+  .nav-link .sub { display: block; font-weight: 700; text-transform: none; }
+  .nav-link:hover { color: var(--hover); }
+  .nav-link.active { opacity: 1; }
+  .nav-link:not(.active) { opacity: 0.35; }
+  .nav-link:not(.active):hover { opacity: 0.7; }
+
+  .photo-nav-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .photo-nav-list li { display: grid; grid-template-columns: 32px 1fr; gap: 6px; align-items: start; }
+  .photo-nav-link {
+    font-weight: 700; font-size: 14px; letter-spacing: 0.02em;
+    color: var(--ink); text-decoration: none; text-transform: uppercase;
+    cursor: pointer; transition: color 0.2s, opacity 0.2s; line-height: 1.35;
+  }
+  .photo-nav-link:hover { color: var(--hover); }
+  .photo-nav-link.active { opacity: 1; }
+  .photo-nav-link:not(.active) { opacity: 0.35; }
+  .photo-nav-link:not(.active):hover { opacity: 0.7; }
+
+  .content {
+    grid-column: 2;
+    overflow-y: auto;
+    height: calc(100vh - 42px);
+  }
+
+  .view-designer { display: block; }
+  .view-photographer { display: none; }
+
+  .project {
+    min-height: calc(100vh - 42px);
+    padding: 24px 72px 80px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .project-inner { width: 100%; max-width: 1000px; display: flex; flex-direction: column; }
+  .project-header {
+    display: grid; grid-template-columns: 60px 1fr auto;
+    gap: 24px; padding-bottom: 12px; margin-bottom: 4px;
+  }
+  .project-num { font-weight: 700; font-size: 13px; }
+  .project-title-block { display: flex; flex-direction: column; gap: 2px; }
+  .project-title { font-weight: 700; font-size: 13px; letter-spacing: 0.02em; }
+  .project-credits { font-size: 11px; font-style: italic; line-height: 1.45; }
+  .project-date { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0.02em; white-space: nowrap; }
+  .project-description { font-size: 12px; line-height: 1.55; margin: 8px 0 28px 84px; }
+
+  .media { margin-left: 84px; width: calc(100% - 84px); position: relative; display: flex; flex-direction: column; align-items: center; }
+  .slideshow { position: relative; width: 100%; }
+  .slides { width: 100%; overflow: hidden; cursor: grab; user-select: none; }
+  .slides:active { cursor: grabbing; }
+  .slides-track { display: flex; transition: transform 0.4s ease; will-change: transform; }
+  .slide { min-width: 100%; width: 100%; flex-shrink: 0; overflow: hidden; }
+  .media-frame { width: 100%; aspect-ratio: 3 / 2; overflow: hidden; background: #1a1a1a; }
+  .media-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .media-frame video { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+  .slideshow-pdf .media-frame { aspect-ratio: 16 / 9; background: #f5f5f5; }
+  .slideshow-pdf .media-frame img { object-fit: contain; }
+
+  .slide-gif .media-frame { aspect-ratio: 16 / 9; background: #f5f5f5; }
+  .slide-gif .media-frame img { object-fit: contain; }
+
+  .slide-btn {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: none; border: none; cursor: pointer;
+    padding: 8px; z-index: 10; color: var(--ink);
+    opacity: 0.35; transition: opacity 0.2s; font-size: 16px; line-height: 1;
+  }
+  .slide-btn:hover { opacity: 1; }
+  .slide-btn.prev { left: -32px; }
+  .slide-btn.next { right: -32px; }
+
+  .slide-dots { display: flex; gap: 4px; margin-top: 10px; justify-content: center; }
+  .dot { width: 20px; height: 2px; background: #ccc; cursor: pointer; transition: background 0.2s; border-radius: 0; }
+  .dot.active { background: var(--ink); }
+
+  .photo-section {
+    padding: 24px 72px 80px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .photo-inner { width: 100%; max-width: 1000px; display: flex; flex-direction: column; }
+  .photo-header {
+    display: grid; grid-template-columns: 60px 1fr auto;
+    gap: 24px; padding-bottom: 28px;
+  }
+  .photo-num { font-weight: 700; font-size: 13px; }
+  .photo-title { font-weight: 700; font-size: 13px; letter-spacing: 0.02em; }
+  .photo-date { font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .photo-grid {
+    margin-left: 84px;
+    width: calc(100% - 84px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: auto;
+    gap: 8px;
+    align-items: start;
+  }
+  .photo-item { overflow: hidden; background: #1a1a1a; aspect-ratio: 3 / 2; }
+  .photo-item.vertical { aspect-ratio: 2 / 3; grid-row: span 2; }
+  .photo-item.full { grid-column: 1 / -1; aspect-ratio: 3 / 2; }
+  .photo-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.2s; }
+  .photo-item img:hover { opacity: 0.85; }
+
+  .scroll-hint {
+    position: fixed; bottom: 18px; right: 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--muted); z-index: 90; pointer-events: none;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .scroll-hint .current { color: var(--ink); font-weight: 600; }
+  .scroll-hint .arrow { display: inline-block; animation: bob 1.6s ease-in-out infinite; }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0); opacity: 0.6; }
+    50% { transform: translateY(3px); opacity: 1; }
+  }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: relative; width: 100%; height: auto; border-bottom: 1px solid #000; }
+    .content { height: auto; }
+    .project, .photo-section { min-height: auto; padding: 24px 24px 48px; }
+    .project-description { margin-left: 84px; }
+    .media, .photo-grid { margin-left: 84px; width: calc(100% - 84px); }
+    .slide-btn.prev { left: -20px; }
+    .slide-btn.next { right: -20px; }
+    .photo-grid { grid-template-columns: 1fr; }
+    .photo-item.vertical { grid-row: span 1; aspect-ratio: 3 / 2; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-name" id="btn-about" style="cursor:pointer;">Ruichen(Cheryl) Ma</span>
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="btn-designer">Designer</button>
+        <span class="mode-divider">/</span>
+        <button class="mode-btn" id="btn-photographer">Photographer</button>
+      </div>
+    </div>
+    <nav class="topbar-right">
+      <a href="mailto:mac021@newschool.edu">MAIL</a>
+      <a href="https://www.instagram.com/cher71m" target="_blank">INSTAGRAM</a>
+    </nav>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-designer" id="sidebar-designer">
+        <ul class="nav-list">
+          <li><span class="nav-num">01</span><a class="nav-link" data-target="p1">Thesis<span class="sub">The Highly Sensitive People</span></a></li>
+          <li><span class="nav-num">02</span><a class="nav-link" data-target="p2">256 images book</a></li>
+          <li><span class="nav-num">03</span><a class="nav-link" data-target="p3">Brand Amare</a></li>
+          <li><span class="nav-num">04</span><a class="nav-link" data-target="p4">Persona</a></li>
+          <li><span class="nav-num">05</span><a class="nav-link" data-target="p5">Risograph Color</a></li>
+          <li><span class="nav-num">06</span><a class="nav-link" data-target="p6">Rework of Wong Kar Wai Movie Posters</a></li>
+          <li><span class="nav-num">07</span><a class="nav-link" data-target="p7">The Edge</a></li>
+          <li><span class="nav-num">08</span><a class="nav-link" data-target="p8">Nature in the Concrete</a></li>
+          <li><span class="nav-num">09</span><a class="nav-link" data-target="p9">How to play Mahjong?</a></li>
+          <li><span class="nav-num">10</span><a class="nav-link" data-target="p10">Memories of Fridge Magnet</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-photographer" id="sidebar-photographer">
+        <ul class="photo-nav-list">
+          <li><span class="nav-num">01</span><a class="photo-nav-link" data-target="ph1">Europe</a></li>
+          <li><span class="nav-num">02</span><a class="photo-nav-link" data-target="ph2">Vancouver</a></li>
+          <li><span class="nav-num">03</span><a class="photo-nav-link" data-target="ph3">Portrait</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-about" id="sidebar-about" style="display:none;">
+        <ul class="nav-list">
+          <li><span class="nav-num"></span><a class="nav-link active" style="opacity:1;">About Me</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <main class="content" id="content">
+      <div class="view-designer" id="view-designer">
+
+        <!-- 01 Thesis 04-2026 -->
+        <section class="project" id="p1">
+          <div class="project-inner">
+            <div class="project-header">
+              <span class="project-num">01</span>
+              <div class="project-title-block">
+                <span class="project-title">Thesis - The Highly Sensitive People</span>
+                <span class="project-credits"><em>Card Game</em><br/><em>Interactive Books</em><br/><em>Website</em><br/><em>Installation</em></span>
+              </div>
+              <span class="project-date">04-2026</span>
+            </div>
+            <p class="project-description">This thesis explores the experience of Highly Sensitive People (HSPs) through interactive systems that convert sensitive perception into tangible forms. The projects, which are based on Dr. Elaine Aron's D.O.E.S. concept—Depth of Processing, Overstimulation, Emotional Intensity, and Sensing the Subtle—and inspired by her book The Highly Sensitive People, which reinterprets sensitivity as a strength of awareness, empathy, and introspection rather than a weakness.</p>
+            <div class="media"><div class="slideshow">
+              <button class="slide-btn prev">←</button>
+              <div class="slides"><div class="slides-track">
+                <div class="slide"><div class="media-frame"><img src="img/DSCF1204.png" alt="Thesis 1" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/DSCF1208-3.jpg" alt="Thesis 2" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/DSCF1210.png" alt="Thesis 3" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/DSCF1375.JPG" alt="Thesis 4" /></div></div>
+                <div class="slide slide-gif"><div class="media-frame"><img src="img/website_recording.gif" alt="Thesis 5" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/DSCF1376.JPG" alt="Thesis 6" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/box.png" alt="Thesis 7" /></div></div>
+              </div></div>
+              <button class="slide-btn next">→</button>
+              <div class="slide-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            </div></div>
+          </div>
+        </section>
+
+        <!-- 02 256 Images 10-2025 -->
+        <section class="project" id="p2">
+          <div class="project-inner">
+            <div class="project-header">
+              <span class="project-num">02</span>
+              <div class="project-title-block">
+                <span class="project-title">256 Images Book</span>
+                <span class="project-credits"><em>Book</em><br/><em>Image Archive</em></span>
+              </div>
+              <span class="project-date">10-2025</span>
+            </div>
+            <p class="project-description">The book is a collection of 256 images organized into separate sections, each of that explores a different visual language. The project is bound together by the theme of the unexpected and embraces difference rather than consistency. Each part is designed with a unique system and aesthetic. The book pushes sections apart, defying traditional ideas of unity, proposing that there can be meaning made through disjunction, surprise and the space between unrelated elements.</p>
+            <div class="media"><div class="slideshow">
+              <button class="slide-btn prev">←</button>
+              <div class="slides"><div class="slides-track">
+                <div class="slide"><div class="media-frame"><img src="img/Untitled-1.png" alt="256 Images 1" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/untitled2.png" alt="256 Images 2" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/untitled3.png" alt="256 Images 3" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/untitled4.png" alt="256 Images 4" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/untitled5.png" alt="256 Images 5" /></div></div>
+              </div></div>
+              <button class="slide-btn next">→</button>
+              <div class="slide-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            </div></div>
+          </div>
+        </section>
+
+        <!-- 03 Brand Amare 10-2025 -->
+        <section class="project" id="p3">
+          <div class="project-inner">
+            <div class="project-header">
+              <span class="project-num">03</span>
+              <div class="project-title-block">
+                <span class="project-title">Brand Amare</span>
+                <span class="project-credits"><em>Identity Design</em><br/><em>Logo</em><br/><em>Brand System</em></span>
+              </div>
+              <span class="project-date">10-2025</span>
+            </div>
+            <p class="project-description">Add your project description here.</p>
+            <div class="media"><div class="slideshow slideshow-pdf">
+              <button class="slide-btn prev">←</button>
+              <div class="slides"><div class="slides-track">
+                <div class="slide"><div class="media-frame"><img src="img/branding-01.jpg" alt="Brand Amare 1" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-02.jpg" alt="Brand Amare 2" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-03.jpg" alt="Brand Amare 3" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-04.jpg" alt="Brand Amare 4" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-05.jpg" alt="Brand Amare 5" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-06.jpg" alt="Brand Amare 6" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-07.jpg" alt="Brand Amare 7" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-08.jpg" alt="Brand Amare 8" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-09.jpg" alt="Brand Amare 9" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-10.jpg" alt="Brand Amare 10" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-11.jpg" alt="Brand Amare 11" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-12.jpg" alt="Brand Amare 12" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-13.jpg" alt="Brand Amare 13" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-14.jpg" alt="Brand Amare 14" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-15.jpg" alt="Brand Amare 15" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-16.jpg" alt="Brand Amare 16" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-17.jpg" alt="Brand Amare 17" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-18.jpg" alt="Brand Amare 18" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-19.jpg" alt="Brand Amare 19" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-20.jpg" alt="Brand Amare 20" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-21.jpg" alt="Brand Amare 21" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-22.jpg" alt="Brand Amare 22" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-23.jpg" alt="Brand Amare 23" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-24.jpg" alt="Brand Amare 24" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-25.jpg" alt="Brand Amare 25" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-26.jpg" alt="Brand Amare 26" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/branding-27.jpg" alt="Brand Amare 27" /></div></div>
+              </div></div>
+              <button class="slide-btn next">→</button>
+              <div class="slide-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            </div></div>
+          </div>
+        </section>
+
+        <!-- 04 Persona 05-2025 -->
+        <section class="project" id="p4">
+          <div class="project-inner">
+            <div class="project-header">
+              <span class="project-num">04</span>
+              <div class="project-title-block">
+                <span class="project-title">Persona</span>
+                <span class="project-credits"><em>AI App</em><br/><em>UI Design</em></span>
+              </div>
+              <span class="project-date">05-2025</span>
+            </div>
+            <p class="project-description">Persona explores the role of artificial intelligence in emotional well-being and self-expression. The app is inspired by the human need to be heard and understood and it offers a safe, approachable environment to share thoughts, record emotions, and have ongoing conversations. Persona is a digital companion that transforms everyday reflections into opportunities for emotional processing, connection, and care through human-like interactions and a warm, character-driven visual identity.</p>
+            <a href="https://www.figma.com/proto/ne8fyyANC1zTjZt974eIgC/Fnl_heterotopia?node-id=1-2&p=f&t=G0DZ85jI0DILbaGH-1&scaling=scale-down&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2" target="_blank" style="display:inline-block; margin: -16px 0 28px 84px; font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink); text-decoration:none; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.4'" onmouseout="this.style.opacity='1'">Prototype ↗</a>
+            <div class="media">
+              <div class="media-frame" style="width:100%;">
+                <img src="img/perspna.gif" alt="Persona demo" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 05 Risograph 05-2025 -->
+        <section class="project" id="p5">
+          <div class="project-inner">
+            <div class="project-header">
+              <span class="project-num">05</span>
+              <div class="project-title-block">
+                <span class="project-title">Risograph Color Converter</span>
+                <span class="project-credits"><em>Web Tool</em><br/><em>UI Design</em></span>
+              </div>
+              <span class="project-date">05-2025</span>
+            </div>
+            <p class="project-description">Inspired by the misregistration, halftone textures and accidental imperfections of Risograph printing, this tool reinterprets the visual language of the medium in a digital environment. It converts full color images to the monochrome print layers, with control over color separations and image processing parameters. Rather than fixing imperfections, the interface accepts the glitches and chaos that are part of Risograph production, transforming technical preparation into a process of design experimentation.</p>
+            <a href="https://cheryl90.github.io/risographcolor/" target="_blank" style="display:inline-block; margin: -16px 0 28px 84px; font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink); text-decoration:none; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.4'" onmouseout="this.style.opacity='1'">Website Access ↗</a>
+            <div class="media">
+              <div class="media-frame" style="width:100%; aspect-ratio: 16/9; background:#f5f5f5;">
+                <img src="img/risocolor.gif" alt="Risograph demo" style="object-fit:contain;" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 06 Wong Kar Wai 05-2025 -->
+        <section class="project" id="p6">
+          <div class="project-inner">
+            <div class="project-header">
+              <span class="project-num">06</span>
+              <div class="project-title-block">
+                <span class="project-title">Rework of Wong Kar Wai Movie Posters</span>
+                <span class="project-credits"><em>Posters</em><br/><em>Film stills</em></span>
+              </div>
+              <span class="project-date">05-2025</span>
+            </div>
+            <p class="project-description">This series reworks a selection of Wong Kar Wai's films from the 1990s and early 2000s, questioning how they would exist under today's censorship in mainland Chinese cinema. As a visual language, the use of ASCII art—suggesting absence, distortion, and loss. Scenes and moments that would probably be cut or changed are no longer fully visible, but are suggested by the incomplete structures. Instead of conserving the original works, the project deliberately disrupts them, looking at how censorship changes not just the narrative content. The work reflects on the difficulty of maintaining the same cinematic experience when the essential elements are no longer permitted to stay.</p>
+            <div class="media"><div class="slideshow">
+              <button class="slide-btn prev">←</button>
+              <div class="slides"><div class="slides-track">
+                <div class="slide"><div class="media-frame"><img src="img/poster1.png" alt="Wong Kar Wai 1" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/poster2.png" alt="Wong Kar Wai 2" /></div></div>
+              </div></div>
+              <button class="slide-btn next">→</button>
+              <div class="slide-dots"><div class="dot active"></div><div class="dot"></div></div>
+            </div></div>
+          </div>
+        </section>
+
+        <!-- 07 The Edge 11-2024 -->
+        <section class="project" id="p7">
+          <div class="project-inner">
+            <div class="project-header">
+              <span class="project-num">07</span>
+              <div class="project-title-block">
+                <span class="project-title">The Edge</span>
+                <span class="project-credits"><em>French Fold Book</em><br/><em>Analog</em></span>
+              </div>
+              <span class="project-date">11-2024</span>
+            </div>
+            <p class="project-description">This tabloid French-fold book focuses on marginalized animals, cultures, generations and people. All text and images are pushed to the margins and edges with the center mostly empty. By reversing the traditional layout, where margins are kept blank, the project focuses attention on what is usually ignored. This spatial displacement is a marker of the ways certain voices are pushed to the margins, but it is also a suggestion that these edges are worth reading more closely, and paying more attention to.</p>
+            <div class="media"><div class="slideshow">
+              <button class="slide-btn prev">←</button>
+              <div class="slides"><div class="slides-track">
+                <div class="slide"><div class="media-frame"><img src="img/DSCF1343.JPG" alt="The Edge 1" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/DSCF1352.JPG" alt="The Edge 2" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/DSCF1338.JPG" alt="The Edge 3" /></div></div>
+              </div></div>
+              <button class="slide-btn next">→</button>
+              <div class="slide-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div></div>
+            </div></div>
+          </div>
+        </section>
+
+        <!-- 08 Nature in the Concrete 09-2024 -->
+        <section class="project" id="p8">
+          <div class="project-inner">
+            <div class="project-header">
+              <span class="project-num">08</span>
+              <div class="project-title-block">
+                <span class="project-title">Nature in the Concrete</span>
+                <span class="project-credits"><em>Editorial Book</em><br/><em>Typography</em></span>
+              </div>
+              <span class="project-date">09-2024</span>
+            </div>
+            <p class="project-description">The book explores the juxtaposition between nature and the built environment in different areas of New York City. The story starts in concrete-dominated landscapes where nature is subtly emerge, and moves towards spaces where nature has taken over completely. This development explores the conflict and coexistence of these two opposites in the project. A series of half-insert pages introduce text within the sequence, allowing viewers to see both conditions at once, reinforcing the idea that nature and concrete are not separate, but are in constant overlap and redefinition.</p>
+            <div class="media"><div class="slideshow">
+              <button class="slide-btn prev">←</button>
+              <div class="slides"><div class="slides-track">
+                <div class="slide"><div class="media-frame"><img src="img/DSCF1360.JPG" alt="Nature 1" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/DSCF1367.JPG" alt="Nature 2" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/DSCF1371.JPG" alt="Nature 3" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/DSCF1362.JPG" alt="Nature 4" /></div></div>
+              </div></div>
+              <button class="slide-btn next">→</button>
+              <div class="slide-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            </div></div>
+          </div>
+        </section>
+
+        <!-- 09 Mahjong 06-2024 -->
+        <section class="project" id="p9">
+          <div class="project-inner">
+            <div class="project-header">
+              <span class="project-num">09</span>
+              <div class="project-title-block">
+                <span class="project-title">How to Play Mahjong?</span>
+                <span class="project-credits"><em>publication design</em><br/><em>offset print, 160pp</em></span>
+              </div>
+              <span class="project-date">06-2024</span>
+            </div>
+            <p class="project-description">Mahjong is a game and cultural ritual commonly associated with gatherings and reunions in Chinese communities. This guidebook introduces mahjong. It explains what mahjong is, its cultural meanings and how to play. The game itself is also the main visual language used throughout. The book is divided into three sections, distinguished by red, blue and green, colours taken from the most iconic and limited palette of mahjong tiles. The three suits, dots, bamboo, and characters, represent the page numbers, thus further integrating the game system into the reading experience. The overall size is scaled proportionally from the real size of a mahjong tile, so the physical object of the book may reflect the physical experience of the game itself.</p>
+            <div class="media"><div class="slideshow">
+              <button class="slide-btn prev">←</button>
+              <div class="slides"><div class="slides-track">
+                <div class="slide"><div class="media-frame"><img src="img/DSCF1502.JPG" alt="Mahjong 1" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/DSCF1506.JPG" alt="Mahjong 2" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/DSCF1507.JPG" alt="Mahjong 3" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/DSCF1512.JPG" alt="Mahjong 4" /></div></div>
+                <div class="slide"><div class="media-frame"><img src="img/book video.gif" alt="Mahjong 5" /></div></div>
+              </div></div>
+              <button class="slide-btn next">→</button>
+              <div class="slide-dots"><div class="dot active"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+            </div></div>
+          </div>
+        </section>
+
+        <!-- 10 Fridge Magnet 04-2024 -->
+        <section class="project" id="p10">
+          <div class="project-inner">
+            <div class="project-header">
+              <span class="project-num">10</span>
+              <div class="project-title-block">
+                <span class="project-title">Memories of Fridge Magnet</span>
+                <span class="project-credits"><em>Digital Archive</em><br/><em>UI Design</em></span>
+              </div>
+              <span class="project-date">04-2024</span>
+            </div>
+            <p class="project-description">Memories of Fridge Magnet is an interactive archive inspired by the refrigerators filled with collected souvenirs from around the world. The website simulates a tactile environment where users can move magnets and notes around, mimicking the experience of interacting with a real refrigerator door. Each magnet has a personal travel memory attached, and each one also shows how small, everyday things can be filled with storytelling, nostalgia and the preservation of lived experiences.</p>
+            <a href="https://cheryl90.github.io/fridge-magnet/homepage.html" target="_blank" style="display:inline-block; margin: -16px 0 28px 84px; font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink); text-decoration:none; transition:opacity 0.2s;" onmouseover="this.style.opacity='0.4'" onmouseout="this.style.opacity='1'">Website Access ↗</a>
+            <div class="media">
+              <div class="media-frame" style="width:100%; aspect-ratio: 16/9; background:#f5f5f5;">
+                <img src="img/fridge.gif" alt="Memories of Fridge Magnet demo" style="object-fit:contain;" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ===== PHOTOGRAPHER ===== -->
+      <div class="view-photographer" id="view-photographer">
+
+        <section class="photo-section" id="ph1">
+          <div class="photo-inner">
+            <div class="photo-header">
+              <span class="photo-num">01</span>
+              <span class="photo-title">Europe</span>
+              <span class="photo-date">2026</span>
+            </div>
+            <div class="photo-grid">
+              <div class="photo-item vertical"><img src="photo/DSCF1475.JPG" alt="Series II 1" /></div>
+              <div class="photo-item"><img src="photo/DSCF1436.JPG" alt="Series II 2" /></div>
+              <div class="photo-item"><img src="photo/DSCF1443.JPG" alt="Series II 3" /></div>
+              <div class="photo-item"><img src="photo/DSCF1463.JPG" alt="Series II 4" /></div>
+              <div class="photo-item vertical"><img src="photo/DSCF1465.JPG" alt="Series II 5" /></div>
+              <div class="photo-item"><img src="photo/DSCF1477.JPG" alt="Series II 6" /></div>
+              <div class="photo-item vertical"><img src="photo/IMG_4588.JPG" alt="Series II 7" /></div>
+              <div class="photo-item"><img src="photo/DSCF1411.JPG" alt="Series II 8" /></div>
+              <div class="photo-item"><img src="photo/DSCF1391.JPG" alt="Series II 9" /></div>
+              <div class="photo-item full"><img src="photo/DSCF1485.JPG" alt="Series II 10" /></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="photo-section" id="ph2">
+          <div class="photo-inner">
+            <div class="photo-header">
+              <span class="photo-num">02</span>
+              <span class="photo-title">Vancouver</span>
+              <span class="photo-date">2026</span>
+            </div>
+            <div class="photo-grid">
+              <div class="photo-item vertical"><img src="photo/DSCF1104.jpg" alt="Series I 1" /></div>
+              <div class="photo-item"><img src="photo/DSCF1045.JPG" alt="Series I 2" /></div>
+              <div class="photo-item"><img src="photo/DSCF1056.JPG" alt="Series I 3" /></div>
+              <div class="photo-item full"><img src="photo/40cc77dfd2b968c5dc32769b07d666f4.JPG" alt="Series I 4" /></div>
+              <div class="photo-item"><img src="photo/DSCF1039.jpg" alt="Series I 5" /></div>
+              <div class="photo-item vertical"><img src="photo/2115135d68bee2ac3203882bef254f63.jpg" alt="Series I 6" /></div>
+              <div class="photo-item"><img src="photo/DSCF1044.jpg" alt="Series I 7" /></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="photo-section" id="ph3">
+          <div class="photo-inner">
+            <div class="photo-header">
+              <span class="photo-num">03</span>
+              <span class="photo-title">Portrait</span>
+              <span class="photo-date">2026</span>
+            </div>
+            <div class="photo-grid">
+              <div class="photo-item"><img src="photo/DSCF1241.JPG" alt="Series III 1" /></div>
+              <div class="photo-item"><img src="photo/DSCF1239.JPG" alt="Series III 2" /></div>
+              <div class="photo-item vertical"><img src="photo/DSCF8589.JPG" alt="Series III 3" /></div>
+              <div class="photo-item"><img src="photo/DSCF1131.JPG" alt="Series III 4" /></div>
+              <div class="photo-item"><img src="photo/DSCF1134.JPG" alt="Series III 5" /></div>
+              <div class="photo-item full"><img src="photo/IMG_7240.JPG" alt="Series III 6" /></div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ===== ABOUT ===== -->
+      <div class="view-about" id="view-about" style="display:none;">
+        <section class="project" style="min-height: calc(100vh - 42px);">
+          <div class="project-inner">
+            <p class="project-description" style="font-size: 13px; line-height: 1.8;">
+              Ruichen (Cheryl) Ma is a Communication Designer graduated from the Parsons School of Design in New York.<br/><br/>
+              Her work explores emotion, memory and human connection through branding, interaction design, creative coding and visual storytelling. She creates work across digital and physical mediums developing projects that transform personal experiences into concrete systems, objects and narratives.<br/><br/>
+              Her recent work explores themes of sensitivity, emotional reflection, family relationships and everyday rituals, while experimenting with the intersection of design, technology and human-centered experiences.<br/><br/>
+              In addition to design, she's into photography, independent publishing, travel and scuba diving.
+            </p>
+          </div>
+        </section>
+      </div>
+
+    </main>
+  </div>
+
+  <div class="scroll-hint">
+    <span class="current" id="hint-num">01</span>
+    <span>/</span>
+    <span id="hint-total">10</span>
+    <span class="arrow">↓</span>
+  </div>
+
+  <script>
+    const content = document.getElementById('content');
+    const sidebarAbout = document.getElementById('sidebar-about');
+    const viewAbout = document.getElementById('view-about');
+    const btnAbout = document.getElementById('btn-about');
+    const hintNum = document.getElementById('hint-num');
+    const hintTotal = document.getElementById('hint-total');
+    const btnDesigner = document.getElementById('btn-designer');
+    const btnPhotographer = document.getElementById('btn-photographer');
+    const viewDesigner = document.getElementById('view-designer');
+    const viewPhotographer = document.getElementById('view-photographer');
+    const sidebarDesigner = document.getElementById('sidebar-designer');
+    const sidebarPhotographer = document.getElementById('sidebar-photographer');
+
+    document.querySelectorAll('.slideshow').forEach(ss => {
+      const track = ss.querySelector('.slides-track');
+      const slides = ss.querySelectorAll('.slide');
+      const dots = ss.querySelectorAll('.dot');
+      const slidesWrap = ss.querySelector('.slides');
+      let current = 0, startX = 0, isDragging = false, dragDelta = 0;
+
+      function goTo(n) {
+        current = (n + slides.length) % slides.length;
+        track.style.transform = `translateX(-${current * 100}%)`;
+        dots.forEach((d, i) => d.classList.toggle('active', i === current));
+        ss.querySelectorAll('video').forEach(v => v.pause());
+        const activeVideo = slides[current].querySelector('video');
+        if (activeVideo) activeVideo.play();
+      }
+
+      ss.querySelector('.prev').addEventListener('click', () => goTo(current - 1));
+      ss.querySelector('.next').addEventListener('click', () => goTo(current + 1));
+      dots.forEach((d, i) => d.addEventListener('click', () => goTo(i)));
+      slidesWrap.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
+      slidesWrap.addEventListener('touchend', e => {
+        const diff = startX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 40) goTo(current + (diff > 0 ? 1 : -1));
+      });
+      slidesWrap.addEventListener('mousedown', e => { isDragging = true; startX = e.clientX; dragDelta = 0; });
+      slidesWrap.addEventListener('mousemove', e => { if (isDragging) dragDelta = startX - e.clientX; });
+      slidesWrap.addEventListener('mouseup', () => {
+        if (isDragging && Math.abs(dragDelta) > 40) goTo(current + (dragDelta > 0 ? 1 : -1));
+        isDragging = false;
+      });
+      slidesWrap.addEventListener('mouseleave', () => { isDragging = false; });
+    });
+
+    let currentObserver = null;
+
+    function initScrollSpy(sections, links) {
+      if (currentObserver) currentObserver.disconnect();
+      const idToIndex = {};
+      sections.forEach((s, i) => { idToIndex[s.id] = String(i + 1).padStart(2, '0'); });
+
+      function setActive(id) {
+        links.forEach(l => l.classList.toggle('active', l.dataset.target === id));
+        if (hintNum && idToIndex[id]) hintNum.textContent = idToIndex[id];
+      }
+
+      currentObserver = new IntersectionObserver((entries) => {
+        let best = null;
+        entries.forEach(e => {
+          if (e.isIntersecting && (!best || e.intersectionRatio > best.intersectionRatio)) best = e;
+        });
+        if (best) setActive(best.target.id);
+      }, { root: content, threshold: [0.3, 0.5, 0.7] });
+
+      sections.forEach(s => currentObserver.observe(s));
+      if (sections.length) setActive(sections[0].id);
+
+      links.forEach(link => {
+        link.addEventListener('click', e => {
+          e.preventDefault();
+          const target = document.getElementById(link.dataset.target);
+          if (target) {
+            const offset = target.getBoundingClientRect().top - content.getBoundingClientRect().top;
+            content.scrollBy({ top: offset, behavior: 'smooth' });
+          }
+        });
+      });
+    }
+
+    function switchMode(mode) {
+      if (mode === 'about') {
+        btnAbout.style.opacity = '1';
+        btnDesigner.classList.remove('active');
+        btnPhotographer.classList.remove('active');
+        viewDesigner.style.display = 'none';
+        viewPhotographer.style.display = 'none';
+        viewAbout.style.display = 'block';
+        sidebarDesigner.style.display = 'none';
+        sidebarPhotographer.style.display = 'none';
+        sidebarAbout.style.display = 'block';
+        document.getElementById('hint-num').textContent = '—';
+        document.getElementById('hint-total').textContent = '—';
+        content.scrollTo({ top: 0 });
+        if (currentObserver) currentObserver.disconnect();
+      } else if (mode === 'designer') {
+        btnAbout.style.opacity = '';
+        btnDesigner.classList.add('active');
+        btnPhotographer.classList.remove('active');
+        viewDesigner.style.display = 'block';
+        viewPhotographer.style.display = 'none';
+        viewAbout.style.display = 'none';
+        sidebarDesigner.style.display = 'block';
+        sidebarPhotographer.style.display = 'none';
+        sidebarAbout.style.display = 'none';
+        hintTotal.textContent = '10';
+        content.scrollTo({ top: 0 });
+        initScrollSpy(
+          document.querySelectorAll('#view-designer .project'),
+          document.querySelectorAll('#sidebar-designer .nav-link')
+        );
+      } else {
+        btnAbout.style.opacity = '';
+        btnPhotographer.classList.add('active');
+        btnDesigner.classList.remove('active');
+        viewPhotographer.style.display = 'block';
+        viewDesigner.style.display = 'none';
+        viewAbout.style.display = 'none';
+        sidebarPhotographer.style.display = 'block';
+        sidebarDesigner.style.display = 'none';
+        sidebarAbout.style.display = 'none';
+        hintTotal.textContent = '03';
+        content.scrollTo({ top: 0 });
+        initScrollSpy(
+          document.querySelectorAll('#view-photographer .photo-section'),
+          document.querySelectorAll('#sidebar-photographer .photo-nav-link')
+        );
+      }
+    }
+
+    btnAbout.addEventListener('click', () => switchMode('about'));
+    btnDesigner.addEventListener('click', () => switchMode('designer'));
+    btnPhotographer.addEventListener('click', () => switchMode('photographer'));
+
+    initScrollSpy(
+      document.querySelectorAll('#view-designer .project'),
+      document.querySelectorAll('#sidebar-designer .nav-link')
+    );
+  </script>
+</body>
+</html>
