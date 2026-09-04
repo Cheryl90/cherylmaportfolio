@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ruichen(Cheryl) Ma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #000000;
+    --ink: #ffffff;
+    --muted: #9a9a9a;
+    --hover: #777777;
+    --line: #2a2a2a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-weight: 400; -webkit-font-smoothing: antialiased;
+    font-size: 13px; line-height: 1.5;
+  }
+  a{color:inherit;}
+  :focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
+
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; height: 42px;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 0 24px; background: var(--bg); z-index: 100;
+    border-bottom: 1px solid var(--line);
+  }
+  .brand { display: flex; align-items: baseline; gap: 12px; }
+  .brand-name { font-weight: 700; font-size: 15px; letter-spacing: 0.02em; cursor:pointer; }
+  .mode-toggle { display: flex; align-items: baseline; gap: 0; }
+  .mode-btn {
+    background: none; border: none; cursor: pointer; font-family: inherit;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em; color: var(--ink);
+    opacity: 0.3; padding: 0; transition: opacity 0.2s;
+  }
+  .mode-btn.active { opacity: 1; }
+  .mode-btn:hover { opacity: 0.7; }
+  .mode-divider { font-size: 11px; color: var(--ink); opacity: 0.3; padding: 0 5px; }
+  .topbar-right { display: flex; gap: 18px; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; }
+  .topbar-right a { color: var(--ink); text-decoration: none; transition: color 0.2s; }
+  .topbar-right a:hover { color: var(--hover); }
+
+  .layout { display: grid; grid-template-columns: 320px 1fr; padding-top: 42px; min-height: 100vh; }
+
+  .sidebar {
+    position: fixed; top: 42px; left: 0; width: 320px; height: calc(100vh - 42px);
+    padding: 28px 24px; background: var(--bg); z-index: 50;
+    display: flex; flex-direction: column; overflow-y: auto;
+  }
+
+  .info-num { font-weight: 700; font-size: 13px; margin-bottom: 6px; font-variant-numeric: tabular-nums; }
+  .info-title { font-family: 'Inter', -apple-system, sans-serif; font-weight: 700; font-size: 19px; line-height: 1.25; letter-spacing: -0.01em; margin-bottom: 4px; }
+  .info-credits { font-size: 12px; font-style: italic; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+  .info-tag { font-family: 'Inter', -apple-system, sans-serif; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 22px; }
+  .info-desc { font-size: 12.5px; line-height: 1.7; color: var(--ink); margin-bottom: 8px; }
+  .info-link { display:inline-block; margin-top:8px; font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; text-decoration:none; color:var(--ink); opacity:0.55; transition:opacity .2s; }
+  .info-link:hover{opacity:1;}
+
+  .nav-list { list-style: none; display: flex; flex-direction: column; gap: 3px; margin-top: auto; padding-top: 28px; border-top: 1px solid var(--line); }
+  .nav-list li { display: grid; grid-template-columns: 18px 1fr; gap: 6px; align-items: baseline; }
+  .nav-dot { font-size: 12px; opacity: 0; }
+  .nav-list li.current .nav-dot { opacity: 1; }
+  .nav-link {
+    font-weight: 600; font-size: 12px; letter-spacing: 0.01em;
+    color: var(--ink); text-decoration: none; cursor: pointer;
+    transition: opacity 0.2s; line-height: 1.6; opacity: 0.35;
+  }
+  .nav-link:hover { opacity: 0.7; }
+  .nav-list li.current .nav-link { opacity: 1; }
+
+  .photo-nav-list { list-style: none; display: flex; flex-direction: column; gap: 4px; margin-top: auto; padding-top: 28px; border-top: 1px solid var(--line); }
+  .photo-nav-list li { display: grid; grid-template-columns: 18px 1fr; gap: 6px; align-items: baseline; }
+  .photo-nav-link { font-weight: 600; font-size: 12px; letter-spacing: 0.01em; color: var(--ink); text-decoration:none; cursor:pointer; opacity:0.35; transition:opacity .2s; }
+  .photo-nav-list li.current .photo-nav-link{ opacity:1; }
+  .photo-nav-list li.current .nav-dot{opacity:1;}
+
+  .content { grid-column: 2; overflow-y: auto; height: calc(100vh - 42px); }
+  .view-designer, .view-photographer { display: block; }
+  .view-photographer, .view-about { display: none; }
+
+  .project-block { padding: 0 5px 5px; }
+  .project-label {
+    padding: 14px 0; font-family:'JetBrains Mono', monospace; font-size: 10.5px;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+    border-top: 1px solid var(--line); margin: 0 -5px 4px; padding-left: 5px; padding-right: 5px;
+  }
+  .project-block:first-child .project-label{ border-top:none; }
+  .media-block { width: 100%; background:#1c1c1c; border-radius: 5px; overflow: hidden; }
+  .media-block img { width: 100%; height: auto; display: block; }
+
+  .project-grid { display: grid; grid-template-columns: 1fr 1.1fr; gap: 8px; }
+  .project-grid .cell { overflow: hidden; background:#1c1c1c; border-radius: 5px; }
+  .project-grid .cell img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .project-grid .cell.small { aspect-ratio: 16 / 10; grid-column: 1; }
+  .project-grid .cell.small:first-child { grid-row: 1; }
+  .project-grid .cell.small:nth-child(2) { grid-row: 2; }
+  .project-grid .cell.tall { grid-column: 2; grid-row: 1 / 3; height: 100%; }
+
+  .project-block > .media-block, .project-block > .project-grid { margin-top: 8px; }
+
+  .photo-section { padding: 0 5px 5px; }
+  .photo-label { padding: 14px 0; font-family:'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); border-top: 1px solid var(--line); margin: 0 -5px 4px; padding-left:5px; padding-right:5px; }
+  .photo-section:first-child .photo-label{ border-top:none; }
+  .photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .photo-grid img { width: 100%; height: 100%; object-fit: cover; aspect-ratio: 3/2; display:block; border-radius: 5px; }
+  .photo-grid .full { grid-column: 1 / -1; aspect-ratio: 16/9; }
+  .photo-grid .vert { aspect-ratio: 2/3; }
+
+  .about-page { padding: 40px 60px; max-width: 640px; }
+  .about-page p { font-size: 13px; line-height: 1.8; margin-bottom: 18px; }
+
+  .scroll-hint {
+    position: fixed; bottom: 18px; right: 24px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--muted); z-index: 90; pointer-events: none;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .scroll-hint .current { color: var(--ink); font-weight: 600; }
+
+  @media (max-width: 860px) {
+    .project-grid { grid-template-columns: 1fr; }
+    .project-grid .cell.small, .project-grid .cell.tall { aspect-ratio: 4/3; grid-column: 1; height: auto; }
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: relative; width: 100%; height: auto; border-right:none; border-bottom: 1px solid var(--line); }
+    .content { height: auto; }
+    .photo-grid { grid-template-columns: 1fr; }
+    .photo-grid .vert, .photo-grid .full { aspect-ratio: 3/2; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-name" id="btn-about" style="cursor:pointer;">Ruichen(Cheryl) Ma</span>
+      <a href="home.html" style="font-size:11px; font-weight:600; letter-spacing:0.08em; color:var(--muted); opacity:.7;">← Work</a>
+      <div class="mode-toggle">
+        <button class="mode-btn active" id="btn-designer">Designer</button>
+        <span class="mode-divider">/</span>
+        <button class="mode-btn" id="btn-photographer">Photographer</button>
+      </div>
+    </div>
+    <nav class="topbar-right">
+      <a href="mailto:cher.m409@gmail.com">EMAIL</a>
+      <a href="https://www.instagram.com/cher71m" target="_blank">INSTAGRAM</a>
+    </nav>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+
+      <div id="sidebar-designer">
+        <div id="info-designer"></div>
+        <ul class="nav-list" id="navlist-designer"></ul>
+      </div>
+
+      <div id="sidebar-photographer" style="display:none;">
+        <div id="info-photographer"></div>
+        <ul class="photo-nav-list" id="navlist-photographer"></ul>
+      </div>
+
+      <div id="sidebar-about" style="display:none;">
+        <div class="info-num"></div>
+        <div class="info-title">About</div>
+      </div>
+    </aside>
+
+    <main class="content" id="content">
+      <div class="view-designer" id="view-designer"></div>
+      <div class="view-photographer" id="view-photographer"></div>
+      <div class="view-about" id="view-about">
+        <div class="about-page">
+          <p>Ruichen (Cheryl) Ma is a Communication Designer graduated from the Parsons School of Design in New York.</p>
+          <p>Her work explores emotion, memory and human connection through branding, interaction design, creative coding and visual storytelling. She creates work across digital and physical mediums developing projects that transform personal experiences into concrete systems, objects and narratives.</p>
+          <p>Her recent work explores themes of sensitivity, emotional reflection, family relationships and everyday rituals, while experimenting with the intersection of design, technology and human-centered experiences.</p>
+          <p>In addition to design, she's into photography, independent publishing, travel and scuba diving.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="scroll-hint">
+    <span class="current" id="hint-num">01</span><span>/</span><span id="hint-total">10</span>
+  </div>
+
+<script>
+var IMG = "https://ruichencherylma.com/img/";
+var PHOTO = "https://ruichencherylma.com/photo/";
+
+function imgSrc(fn, base){
+  if(fn && typeof fn === "object") return (fn.base !== undefined ? fn.base : base) + fn.file;
+  return base + fn;
+}
+
+var projects = [
+  { num:"01", title:"The Highly Sensitive People", tag:"Card game · Interactive book · Website · Installation · 2026",
+    desc:"This thesis explores the experience of Highly Sensitive People (HSPs) through interactive systems that convert sensitive perception into tangible forms. Based on Dr. Elaine Aron's D.O.E.S. concept — Depth of Processing, Overstimulation, Emotional Intensity, and Sensing the Subtle — it reinterprets sensitivity as a strength of awareness, empathy and introspection rather than a weakness.",
+    leadFull:2,
+    imgs:["DSCF1204.png","DSCF1208-3.jpg","DSCF1375.JPG","DSCF1376.JPG","box.png","DSCF1210.png","website_recording.gif"] },
+  { num:"02", title:"Brand Amare", credits:"Identity design, logo, brand system", tag:"Branding · 2025",
+    desc:"Amare is a brand for the millennial generation balancing work, family life and other responsibilities. The project asks whether branding can encourage people to spend more meaningful time with the people they love, building the identity system around togetherness and well-being.",
+    leadFull:14,
+    imgs:["amare-01.png","amare-02.png","amare-03.png","amare-04.png","amare-05.png","amare-06.png","amare-07.png","amare-08.png","amare-09.png","amare-10.png","amare-11.png","amare-12.png","amare-13.png","amare-14.png"], imgBase:"" },
+  { num:"03", title:"Risograph Color Converter", credits:"Web tool, UI design", tag:"Tool · 2025",
+    desc:"Inspired by the misregistration, halftone textures and accidental imperfections of Risograph printing, this tool converts full-color images into monochrome print layers with control over separations and processing. Rather than fixing imperfections, the interface accepts the glitches that are part of Risograph production.",
+    link:"https://cheryl90.github.io/risographcolor/", linkLabel:"Website Access ↗",
+    imgs:["risocolor.gif"] },
+  { num:"04", title:"Persona", credits:"AI app, UI design", tag:"Product · 2025",
+    desc:"Persona explores the role of artificial intelligence in emotional well-being and self-expression — a digital companion that turns everyday reflections into opportunities for emotional processing, connection and care, through human-like interaction and a warm, character-driven visual identity.",
+    link:"https://www.figma.com/proto/ne8fyyANC1zTjZt974eIgC/Fnl_heterotopia?node-id=1-2&p=f&t=G0DZ85jI0DILbaGH-1&scaling=scale-down&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2", linkLabel:"Prototype ↗",
+    imgs:["perspna.gif"] },
+  { num:"05", title:"How to Play Mahjong?", credits:"Publication design, offset print, 160pp", tag:"Publication · 2024",
+    desc:"A guidebook to mahjong, a game and cultural ritual central to gatherings in Chinese communities. The book is divided into three sections in the red, blue and green of mahjong tiles, with page numbers built from the dots, bamboo and character suits, and a trim size scaled from a real tile.",
+    imgs:["DSCF1502.JPG","DSCF1506.JPG","DSCF1512.JPG","DSCF1507.JPG","book%20video.gif"] },
+  { num:"06", title:"Rework of Wong Kar Wai Posters", credits:"Posters, film stills", tag:"Print · 2025",
+    desc:"This series reworks a selection of Wong Kar Wai's films from the 1990s and early 2000s, questioning how they would exist under today's censorship in mainland Chinese cinema. ASCII art suggests absence, distortion and loss where scenes would likely be cut or changed.",
+    imgs:["poster1.png",{file:"poster2.png", base:""}] },
+  { num:"07", title:"The Edge", credits:"French fold book, analog", tag:"Publication · 2024",
+    desc:"A tabloid French-fold book focused on marginalized animals, cultures, generations and people. Text and images are pushed to the margins and edges with the center mostly empty, a spatial displacement that mirrors how certain voices are pushed to the margins — and are worth reading more closely.",
+    imgs:["DSCF1343.JPG","DSCF1352.JPG","DSCF1338.JPG"] },
+  { num:"08", title:"Nature in the Concrete", credits:"Editorial book, typography", tag:"Publication · 2024",
+    desc:"Explores the juxtaposition between nature and the built environment across New York City, moving from concrete-dominated landscapes to spaces where nature has taken over completely. Half-insert pages let both conditions be seen at once, reinforcing that nature and concrete are in constant overlap.",
+    imgs:["DSCF1360.JPG","DSCF1362.JPG","DSCF1367.JPG","DSCF1371.JPG"] },
+  { num:"09", title:"256 Images Book", credits:"Book, image archive", tag:"Publication · 2025",
+    desc:"A collection of 256 images organized into separate sections, each exploring a different visual language. Bound together by the theme of the unexpected, the book pushes sections apart, proposing that meaning can be made through disjunction, surprise and the space between unrelated elements.",
+    imgs:["Untitled-1.png","untitled2.png","untitled3.png","untitled4.png"] },
+  { num:"10", title:"Sketch3d.ai", credits:"Visual identity, UI design", tag:"Product design · Internship · 2025",
+    desc:"Sketch3d.ai is a browser-based 2D/3D floor-planning tool for creating and furnishing spatial environments. I worked across brand and product design, developing the visual identity and refining key UI experiences to create a more cohesive, intuitive, and recognizable product.",
+    imgs:["sketch3d-01.gif","sketch3d-02.gif"], imgBase:"" }
+];
+
+var photoSeries = [
+  { num:"01", title:"Europe", tag:"2026",
+    imgs:[["DSCF1475.JPG","vert"],["DSCF1436.JPG",""],["DSCF1443.JPG",""],["DSCF1463.JPG",""],["DSCF1465.JPG","vert"],["DSCF1477.JPG",""],["IMG_4588.JPG","vert"],["DSCF1411.JPG",""],["DSCF1391.JPG",""],["DSCF1485.JPG","full"]] },
+  { num:"02", title:"Vancouver", tag:"2026",
+    imgs:[["DSCF1104.jpg","vert"],["DSCF1045.JPG",""],["DSCF1056.JPG",""],["40cc77dfd2b968c5dc32769b07d666f4.JPG","full"],["DSCF1039.jpg",""],["2115135d68bee2ac3203882bef254f63.jpg","vert"],["DSCF1044.jpg",""]] },
+  { num:"03", title:"Portrait", tag:"2026",
+    imgs:[["DSCF1241.JPG",""],["DSCF1239.JPG",""],["DSCF8589.JPG","vert"],["DSCF1131.JPG",""],["DSCF1134.JPG",""],["IMG_7240.JPG","full"]] }
+];
+
+function buildDesigner(){
+  var view = document.getElementById('view-designer');
+  var navlist = document.getElementById('navlist-designer');
+  projects.forEach(function(p, i){
+    var block = document.createElement('section');
+    block.className = 'project-block'; block.id = 'p'+(i+1); block.dataset.i = i;
+    var label = document.createElement('div');
+    label.className = 'project-label';
+    label.textContent = p.num + ' — ' + p.title;
+    block.appendChild(label);
+    var imgs = p.imgs;
+    var base = (p.imgBase !== undefined) ? p.imgBase : IMG;
+    var lead = p.leadFull || 0;
+    for(var li=0; li<lead && li<imgs.length; li++){
+      var mbLead = document.createElement('div'); mbLead.className = 'media-block';
+      var imgLead = document.createElement('img');
+      imgLead.src = imgSrc(imgs[li], base); imgLead.alt = p.title; imgLead.loading = 'lazy';
+      mbLead.appendChild(imgLead); block.appendChild(mbLead);
+    }
+    if(imgs.length - lead <= 1){
+      imgs.slice(lead).forEach(function(fn){
+        var mb = document.createElement('div'); mb.className = 'media-block';
+        var img = document.createElement('img');
+        img.src = imgSrc(fn, base); img.alt = p.title; img.loading = 'lazy';
+        mb.appendChild(img); block.appendChild(mb);
+      });
+    } else {
+      var idx = lead;
+      while(idx < imgs.length){
+        var remaining = imgs.length - idx;
+        if(remaining === 1 || remaining === 2){
+          for(var k=0;k<remaining;k++){
+            var mb = document.createElement('div'); mb.className = 'media-block';
+            var img = document.createElement('img');
+            img.src = imgSrc(imgs[idx+k], base); img.alt = p.title; img.loading = 'lazy';
+            mb.appendChild(img); block.appendChild(mb);
+          }
+          idx += remaining;
+        } else {
+          var grid = document.createElement('div'); grid.className = 'project-grid';
+          [0,1].forEach(function(k){
+            var cell = document.createElement('div'); cell.className = 'cell small';
+            var img = document.createElement('img');
+            img.src = imgSrc(imgs[idx+k], base); img.alt = p.title; img.loading = 'lazy';
+            cell.appendChild(img); grid.appendChild(cell);
+          });
+          var tcell = document.createElement('div'); tcell.className = 'cell tall';
+          var timg = document.createElement('img');
+          timg.src = imgSrc(imgs[idx+2], base); timg.alt = p.title; timg.loading = 'lazy';
+          tcell.appendChild(timg); grid.appendChild(tcell);
+          block.appendChild(grid);
+          idx += 3;
+        }
+      }
+    }
+    view.appendChild(block);
+
+    var li = document.createElement('li');
+    var a = document.createElement('a');
+    a.className = 'nav-link'; a.textContent = p.num + ' ' + p.title;
+    a.addEventListener('click', function(){ block.scrollIntoView({behavior:'smooth', block:'start'}); });
+    li.innerHTML = '<span class="nav-dot">•</span>';
+    li.appendChild(a);
+    li.dataset.i = i;
+    navlist.appendChild(li);
+  });
+}
+
+function buildPhotographer(){
+  var view = document.getElementById('view-photographer');
+  var navlist = document.getElementById('navlist-photographer');
+  photoSeries.forEach(function(s, i){
+    var block = document.createElement('section');
+    block.className = 'photo-section'; block.id = 'ph'+(i+1); block.dataset.i = i;
+    var label = document.createElement('div');
+    label.className = 'photo-label';
+    label.textContent = s.num + ' — ' + s.title;
+    block.appendChild(label);
+    var grid = document.createElement('div'); grid.className = 'photo-grid';
+    s.imgs.forEach(function(pair){
+      var img = document.createElement('img');
+      img.src = PHOTO + pair[0]; img.alt = s.title; img.loading = 'lazy';
+      if(pair[1]) img.className = pair[1];
+      grid.appendChild(img);
+    });
+    block.appendChild(grid);
+    view.appendChild(block);
+
+    var li = document.createElement('li');
+    var a = document.createElement('a');
+    a.className = 'photo-nav-link'; a.textContent = s.num + ' ' + s.title;
+    a.addEventListener('click', function(){ block.scrollIntoView({behavior:'smooth', block:'start'}); });
+    li.innerHTML = '<span class="nav-dot">•</span>';
+    li.appendChild(a);
+    li.dataset.i = i;
+    navlist.appendChild(li);
+  });
+}
+
+function renderInfo(target, p, isProject){
+  var html = '<div class="info-num">' + p.num + '</div>';
+  html += '<div class="info-title">' + p.title + '</div>';
+  if(isProject){
+    if(p.credits) html += '<div class="info-credits">' + p.credits + '</div>';
+    html += '<div class="info-tag">' + p.tag + '</div>';
+    html += '<div class="info-desc">' + p.desc + '</div>';
+    if(p.link) html += '<a class="info-link" href="'+p.link+'" target="_blank" rel="noopener">'+p.linkLabel+'</a>';
+  } else {
+    html += '<div class="info-tag">' + p.tag + '</div>';
+  }
+  target.innerHTML = html;
+}
+
+var content = document.getElementById('content');
+var observerDesigner = null, observerPhotographer = null;
+
+function setupObserver(blocks, dataArr, infoTarget, navlistId, isProject, hintTotal){
+  function update(){
+    var contentTop = content.getBoundingClientRect().top;
+    var current = 0;
+    for(var i = 0; i < blocks.length; i++){
+      var top = blocks[i].getBoundingClientRect().top - contentTop;
+      if(top <= 140) current = i; else break;
+    }
+    renderInfo(infoTarget, dataArr[current], isProject);
+    document.getElementById('hint-num').textContent = dataArr[current].num;
+    document.getElementById('hint-total').textContent = hintTotal;
+    var list = document.getElementById(navlistId);
+    Array.prototype.forEach.call(list.children, function(li){
+      li.classList.toggle('current', parseInt(li.dataset.i,10) === current);
+    });
+  }
+  var ticking = false;
+  content.addEventListener('scroll', function(){
+    if(!ticking){
+      ticking = true;
+      requestAnimationFrame(function(){ update(); ticking = false; });
+    }
+  });
+  update();
+  return { update: update };
+}
+
+function switchMode(mode){
+  var vd = document.getElementById('view-designer');
+  var vp = document.getElementById('view-photographer');
+  var va = document.getElementById('view-about');
+  var sd = document.getElementById('sidebar-designer');
+  var sp = document.getElementById('sidebar-photographer');
+  var sa = document.getElementById('sidebar-about');
+  var btnD = document.getElementById('btn-designer');
+  var btnP = document.getElementById('btn-photographer');
+
+  vd.style.display = mode === 'designer' ? 'block' : 'none';
+  vp.style.display = mode === 'photographer' ? 'block' : 'none';
+  va.style.display = mode === 'about' ? 'block' : 'none';
+  sd.style.display = mode === 'designer' ? 'block' : 'none';
+  sp.style.display = mode === 'photographer' ? 'block' : 'none';
+  sa.style.display = mode === 'about' ? 'block' : 'none';
+  btnD.classList.toggle('active', mode === 'designer');
+  btnP.classList.toggle('active', mode === 'photographer');
+
+  content.scrollTo({top:0});
+
+  if(mode === 'designer'){
+    renderInfo(document.getElementById('info-designer'), projects[0], true);
+    document.getElementById('hint-num').textContent = '01';
+    document.getElementById('hint-total').textContent = '10';
+  } else if(mode === 'photographer'){
+    renderInfo(document.getElementById('info-photographer'), photoSeries[0], false);
+    document.getElementById('hint-num').textContent = '01';
+    document.getElementById('hint-total').textContent = '03';
+  } else {
+    document.getElementById('hint-num').textContent = '—';
+    document.getElementById('hint-total').textContent = '—';
+  }
+}
+
+buildDesigner();
+buildPhotographer();
+renderInfo(document.getElementById('info-designer'), projects[0], true);
+renderInfo(document.getElementById('info-photographer'), photoSeries[0], false);
+
+observerDesigner = setupObserver(
+  Array.prototype.slice.call(document.querySelectorAll('#view-designer .project-block')),
+  projects, document.getElementById('info-designer'), 'navlist-designer', true, '10'
+);
+observerPhotographer = setupObserver(
+  Array.prototype.slice.call(document.querySelectorAll('#view-photographer .photo-section')),
+  photoSeries, document.getElementById('info-photographer'), 'navlist-photographer', false, '03'
+);
+
+document.getElementById('btn-about').addEventListener('click', function(){ switchMode('about'); });
+document.getElementById('btn-designer').addEventListener('click', function(){ switchMode('designer'); });
+document.getElementById('btn-photographer').addEventListener('click', function(){ switchMode('photographer'); });
+
+switchMode('designer');
+
+if(location.hash){
+  var target = document.querySelector(location.hash);
+  if(target){
+    setTimeout(function(){ target.scrollIntoView({block:'start'}); }, 50);
+  }
+}
+</script>
+</body>
+</html>
