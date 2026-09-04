@@ -164,7 +164,7 @@ function zoomInto(el, src, id){
   });
 
   setTimeout(function(){
-    window.location.href = 'koto-project-style.html#' + id;
+    window.location.href = (id === 'p1') ? 'project-page.html' : 'project-page.html#' + id;
   }, 560);
 }
 </script>
